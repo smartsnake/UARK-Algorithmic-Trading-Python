@@ -2,7 +2,7 @@ import alpaca_trade_api as tradeapi
 import json
 from time import sleep
 
-class market_bot():
+class market_data():
     def __init__(self):
         data = None
         with open('../credentials/data.json') as json_file:

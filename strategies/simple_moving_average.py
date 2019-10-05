@@ -1,7 +1,7 @@
 import alpaca_trade_api as tradeapi
 import json
 from src.trading_bot import trading_bot
-from src.market_bot import market_bot
+from src.market_data import market_data
 
 
 debug = True
