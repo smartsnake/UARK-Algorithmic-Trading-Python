@@ -44,10 +44,10 @@ class trading_bot():
     
     #Sells all shares
     def closeAllPositions(self):
-        self.alpaca.closeAllPositions()
+        self.alpaca.close_all_positions()
         print("***** All positions have been closed *****")
     
     def cancelAllPendingOrders(self):
-        self.alpaca.cancelAllOrders()
+        self.alpaca.cancel_all_orders()
         print("***** All pending orders have been canceled *****")
     
