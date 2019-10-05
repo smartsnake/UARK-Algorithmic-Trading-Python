@@ -15,9 +15,7 @@ class market_data():
         dataArray = []
         for element in desiredData:
             dataArray.push(element[dataType])
-            #console.log(desiredData[i]);
-        
-        #console.log(dataArray);
+            
         return dataArray
     
     def getShares(self, symbol):
