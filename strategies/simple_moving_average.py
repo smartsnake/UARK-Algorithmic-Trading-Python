@@ -10,7 +10,7 @@ class simple_moving_average():
     def __init__(self):
 
         data = None
-        with open('../credentials/data.json') as json_file:
+        with open('./credentials/data.json') as json_file:
             data = json.load(json_file)
         self.alpaca = tradeapi.REST(data['API_KEY'], data['API_SECRET'], data['APCA_API_BASE_URL'], 'v2')
 
