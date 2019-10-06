@@ -11,7 +11,7 @@ class trading_bot():
         self.account = self.alpaca.get_account()
 
     #Completes transactions such as buying and selling
-    def submitOrder(self, quantity,company,side): # Ex. 1, "FB", "buy"
+    def submitOrder(self, quantity, company, side): # Ex. 1, "FB", "buy"
         time = self.alpaca.get_clock()
         if quantity > 0:
           try:

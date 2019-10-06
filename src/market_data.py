@@ -10,7 +10,7 @@ class market_data():
         self.alpaca = tradeapi.REST(data['API_KEY'], data['API_SECRET'], data['APCA_API_BASE_URL'], 'v2')
     
     def getPrice(self, barDuration, symbol, pastDays, dataType): #barDuration = 'minute' | '1Min' | '5Min' | '15Min' | 'day' | '1D' ______ dataType = "t" | "o" | "h" | "l" | "c" | "v"
-        price = self.alpaca.getBars(symbol, barDuration, limit = pastDays)
+        price = self.alpaca.get_barset(symbol, barDuration, limit = pastDays)
         desiredData = price[symbol]
         dataArray = []
         for element in desiredData:

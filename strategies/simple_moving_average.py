@@ -49,7 +49,7 @@ class simple_moving_average():
                 print(f'spyPosition: {spyPosition}')
             
             #Gets Account Information
-            account = self.alpaca.getAccount()
+            account = self.alpaca.get_account()
             #Setting the position Size to 10% of portfolio
             positionSize = account['portfolio_value'] * .1
             print(f'Position Size: {positionSize}')
