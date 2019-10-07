@@ -2,9 +2,11 @@ import alpaca_trade_api as tradeapi
 import json
 from src.trading_bot import trading_bot
 from src.market_data import market_data
+from time import sleep
 
 
 debug = True
+Trading = True
 
 class simple_moving_average():
 
@@ -14,13 +16,16 @@ class simple_moving_average():
         with open('./credentials/data.json') as json_file:
             data = json.load(json_file)
         self.alpaca = tradeapi.REST(data['API_KEY'], data['API_SECRET'], data['APCA_API_BASE_URL'], 'v2')
+
+        self.market_data = market_data()
+        self.trading_bot = trading_bot()
         
     def __str__(self):
         return 'simple_moving_average'
 
     def getAverage(self, dataArray):
         Total = 0
-        Avg = 0
+        Avg = None
         for element in dataArray:
             Total += element
         Avg = (Total/len(dataArray))
@@ -30,7 +35,7 @@ class simple_moving_average():
         while True:
             if debug:
                 print('Working...')
-
+            sleep(2)#wait 2 seconds
             #/*******************************************************
             #Checking to make sure the market is open!
             #********************************************************/
@@ -45,21 +50,23 @@ class simple_moving_average():
             spyPosition = None
             try:
                 currentData = self.alpaca.get_position('SPY')
-                spyPosition = currentData["qty"]
+                spyPosition = int(currentData.qty)
             except:
+                print('------------EXCEPT---------------------')
                 spyPosition = 0
 
             if debug:
                 print(f'spyPosition: {spyPosition}')
             
             #Gets Account Information
-            account = self.alpaca.get_account()
             #Setting the position Size to 10% of portfolio
-            positionSize = account['portfolio_value'] * .1
+            positionSize = int(float(self.alpaca.get_account().equity) * 0.1)
             print(f'Position Size: {positionSize}')
             #Get the current Price of SPY to figure out the amount of shares we need to purchuse
-            currentPrice  = market_data.getPrice("minute",'SPY',1,"o")
+            currentPrice  = self.market_data.getPrice(barDuration='minute',symbol='SPY',pastDays=1,dataType='o')
             #Setting the Order Size (Number of shares)
+            if debug:
+                print(f'current price: {currentPrice}')
             shareOrderSize = int(positionSize / currentPrice[0])
             print(f'Share order size: {shareOrderSize}')
 
@@ -68,15 +75,18 @@ class simple_moving_average():
             # *******************************************************/
             #Part 1 (15 min Average)
             #Calculating the 15min moving average as MA15Avg
-            MA15  = market_data.getPrice("minute",'SPY',15,"o")
+            MA15  = self.market_data.getPrice("minute",'SPY',15,"o")
+            
             MA15Avg = self.getAverage(MA15)
     
             #Part 2 (30 min Average)
             #Calculating the 30min moving average as MA30Avg
-            MA30  = market_data.getPrice("minute",'SPY',30,"o")
+            MA30  = self.market_data.getPrice("minute",'SPY',30,"o")
             MA30Avg = self.getAverage(MA30)
             if debug:
+                #print(f'MA15 data: {MA15}')
                 print(f'MA15 = {MA15Avg}')
+                #print(f'MA10 data: {MA30}')
                 print(f'MA30 = {MA30Avg}')
                 print(f'MA15Avg > MA30Avg: {MA15Avg>MA30Avg}')
             
@@ -84,27 +94,29 @@ class simple_moving_average():
             # Buy/Sell logic
             # ****************************************************/
             #if there is no postion in SPY we need to open one
-            if spyPosition == 0 :
-                if(MA15Avg>MA30Avg):#if MA15 greater than MA30 buy 10% of portfolio
-                    trading_bot.submitOrder(shareOrderSize,"SPY","buy")
-                else:
-                    trading_bot.submitOrder(shareOrderSize,"SPY","sell")
-            
-            #If we have a postive number of shares of SPY (Meaning we are already long)    
-            elif spyPosition > 0:
-                if MA15Avg<MA30Avg:
-                    # 1) Close Current Position
-                    trading_bot.sellAllCompanyStocks("SPY")
-                    # 2) Open a Short Position with 10% of portfolio
-                    trading_bot.submitOrder(shareOrderSize,"SPY","sell")
-            
-            #If we have a negative number of shares of SPY (Meaning we are alreday short)    
-            elif spyPosition < 0:
-                if MA15Avg>MA30Avg:
-                    # 1) Close Current Position
-                    trading_bot.sellAllCompanyStocks("SPY")
-                    # 2) Open a Long Position with 10% of portfolio
-                    trading_bot.submitOrder(shareOrderSize,"SPY","buy")
+            if Trading:
+                if spyPosition == 0 :
+                    if(MA15Avg>MA30Avg):#if MA15 greater than MA30 buy 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="buy")
+                    else:
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="sell")
+                
+                #If we have a postive number of shares of SPY (Meaning we are already long)    
+                elif spyPosition > 0:
+                    if MA15Avg<MA30Avg:
+                        # 1) Close Current Position
+                        self.trading_bot.sellAllCompanyStocks("SPY")
+                        # 2) Open a Short Position with 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="sell")
+                
+                #If we have a negative number of shares of SPY (Meaning we are alreday short)    
+                elif spyPosition < 0:
+                    if MA15Avg>MA30Avg:
+                        # 1) Close Current Position
+                        self.trading_bot.sellAllCompanyStocks(company="SPY")
+                        # 2) Open a Long Position with 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="buy")
+                    
                 
             
     

@@ -12,10 +12,11 @@ class market_data():
     def getPrice(self, barDuration, symbol, pastDays, dataType): #barDuration = 'minute' | '1Min' | '5Min' | '15Min' | 'day' | '1D' ______ dataType = "t" | "o" | "h" | "l" | "c" | "v"
         price = self.alpaca.get_barset(symbol, barDuration, limit = pastDays)
         desiredData = price[symbol]
+        #print(f'data: {desiredData}')
         dataArray = []
         for element in desiredData:
-            dataArray.push(element[dataType])
-            
+            dataArray.append(element.o)
+        #print(f'dataArray: {dataArray}')
         return dataArray
     
     def getShares(self, symbol):
