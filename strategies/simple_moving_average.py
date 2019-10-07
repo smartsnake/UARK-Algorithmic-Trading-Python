@@ -42,7 +42,8 @@ class simple_moving_average():
             time = self.alpaca.get_clock()
             if not time.is_open:
                print('Not Open!')
-               break
+               self.market_data.waitForMarketToOpen()
+               ##break
             
             # /*******************************************************
             # Gets the Number a Shares of SPY and OrderSize
