@@ -11,7 +11,6 @@ Trading = True
 class simple_moving_average():
 
     def __init__(self):
-
         data = None
         with open('./credentials/data.json') as json_file:
             data = json.load(json_file)
@@ -35,7 +34,7 @@ class simple_moving_average():
         while True:
             if debug:
                 print('Working...')
-            sleep(2)#wait 2 seconds
+            sleep(1)#wait 15 seconds
             #/*******************************************************
             #Checking to make sure the market is open!
             #********************************************************/
@@ -76,18 +75,15 @@ class simple_moving_average():
             # *******************************************************/
             #Part 1 (15 min Average)
             #Calculating the 15min moving average as MA15Avg
-            MA15  = self.market_data.getPrice("minute",'SPY',15,"o")
-            
+            MA15  = self.market_data.getPrice("1Min",'SPY',15,"o")
             MA15Avg = self.getAverage(MA15)
     
             #Part 2 (30 min Average)
             #Calculating the 30min moving average as MA30Avg
-            MA30  = self.market_data.getPrice("minute",'SPY',30,"o")
+            MA30  = self.market_data.getPrice("1Min",'SPY',30,"o")
             MA30Avg = self.getAverage(MA30)
             if debug:
-                #print(f'MA15 data: {MA15}')
                 print(f'MA15 = {MA15Avg}')
-                #print(f'MA10 data: {MA30}')
                 print(f'MA30 = {MA30Avg}')
                 print(f'MA15Avg > MA30Avg: {MA15Avg>MA30Avg}')
             

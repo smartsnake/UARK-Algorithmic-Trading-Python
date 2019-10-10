@@ -10,13 +10,13 @@ class market_data():
         self.alpaca = tradeapi.REST(data['API_KEY'], data['API_SECRET'], data['APCA_API_BASE_URL'], 'v2')
     
     def getPrice(self, barDuration, symbol, pastDays, dataType): #barDuration = 'minute' | '1Min' | '5Min' | '15Min' | 'day' | '1D' ______ dataType = "t" | "o" | "h" | "l" | "c" | "v"
+        #Possible problem with API no supplying new datapoints
+        #The API might only have new datapoints every minute or so.
         price = self.alpaca.get_barset(symbol, barDuration, limit = pastDays)
         desiredData = price[symbol]
-        #print(f'data: {desiredData}')
         dataArray = []
         for element in desiredData:
-            dataArray.append(element.o)
-        #print(f'dataArray: {dataArray}')
+            dataArray.append(element.o)#Need to fix this, doesnt chech dataType, Assumes the dataType is open
         return dataArray
     
     def getShares(self, symbol):
