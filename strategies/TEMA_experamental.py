@@ -138,5 +138,31 @@ class TEMA_experamental():
                 print(f'MA100 pd = {MA100Avg}')
                 print(f'MA100 ema = {MA100EMA}')
                 
-                #print(f'MA20Avg > MA100Avg: {MA20Avg > MA100Avg}')
+            # /***************************************************
+            # Buy/Sell logic
+            # ****************************************************/
+            #if there is no postion in SPY we need to open one
+            if Trading:
+                if spyPosition == 0 :
+                    if(MA20Avg>MA100EMA):#if MA20 greater than MA100 buy 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="buy")
+                    else:
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="sell")
+                
+                #If we have a postive number of shares of SPY (Meaning we are already long)    
+                elif spyPosition > 0:
+                    if MA20Avg<MA100EMA:
+                        # 1) Close Current Position
+                        self.trading_bot.sellAllCompanyStocks("SPY")
+                        # 2) Open a Short Position with 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="sell")
+                
+                #If we have a negative number of shares of SPY (Meaning we are alreday short)    
+                elif spyPosition < 0:
+                    if MA20Avg>MA100EMA:
+                        # 1) Close Current Position
+                        self.trading_bot.sellAllCompanyStocks(company="SPY")
+                        # 2) Open a Long Position with 10% of portfolio
+                        self.trading_bot.submitOrder(quantity=shareOrderSize,company="SPY", side="buy")
+                    
             break
